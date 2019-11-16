@@ -8,33 +8,27 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.jbatista.wmo.AudioFormat;
-import com.jbatista.wmo.KeyboardNote;
-import com.jbatista.wmo.synthesis.Instrument;
+import com.jbatista.wmo.operator.instrument.InstrumentActor;
 import com.kotcrab.vis.ui.VisUI;
 
 public class Main extends ApplicationAdapter {
     private Camera camera;
     private Stage stage;
 
-    private Instrument instrument = new Instrument(AudioFormat._44100Hz_16bit);
-
     private InstrumentActor instrumentActor;
-    private KeyboardProcessor keyboardProcessor;
 
     @Override
     public void create() {
         VisUI.load();
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        stage = new Stage(new FitViewport(450, 800, camera));
+        stage = new Stage(new FitViewport(1280, 720, camera));
 
-        instrumentActor = new InstrumentActor(instrument);
-        keyboardProcessor = new KeyboardProcessor(instrument, 12, KeyboardNote.C_4);
+        instrumentActor = new InstrumentActor();
 
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
-        multiplexer.addProcessor(keyboardProcessor);
+        multiplexer.addProcessor(instrumentActor.getKeyboardInputProcessor());
         Gdx.input.setInputProcessor(multiplexer);
 
         stage.addActor(instrumentActor);
