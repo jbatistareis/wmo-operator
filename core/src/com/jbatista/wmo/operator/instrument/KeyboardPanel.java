@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -16,8 +16,7 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import java.util.LinkedList;
 import java.util.List;
 
-public class KeyboardPanel extends Table {
-
+public class KeyboardPanel extends Window {
     private final InstrumentActor instrumentActor;
     private final List<Image> keys = new LinkedList<>();
 
@@ -34,7 +33,8 @@ public class KeyboardPanel extends Table {
 
     private boolean clicked = false;
 
-    KeyboardPanel(InstrumentActor instrumentActor) {
+    KeyboardPanel(InstrumentActor instrumentActor, Skin skin) {
+        super("", skin);
         this.instrumentActor = instrumentActor;
 
         for (int i = 0; i < instrumentActor.getNotes().length; i++) {
@@ -91,6 +91,15 @@ public class KeyboardPanel extends Table {
     }
 
     void changeOctaveLabel(int index) {
+        String title;
+        if (index == 0) {
+            title = "Octave 2";
+        } else {
+            title = "Octaves " + (index + 1) + "/" + (index + 2);
+        }
+
+        getTitleLabel().setText(title);
+
         labelButtons.forEach(button -> {
             button.setColor(Color.WHITE);
             button.setText("-");
