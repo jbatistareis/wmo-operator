@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
-public class OscillatorPanel extends Window {
+class OscillatorPanel extends Window {
 
     private final Oscillator oscillator;
     private final VisTable mainTable = new VisTable();
@@ -139,10 +139,11 @@ public class OscillatorPanel extends Window {
         setBreakpointBindings();
     }
 
-    public void reload() {
+    void reload() {
         setFrequencyControls();
         setFrequencyLabel();
         setEgControls();
+        setBreakpointControls();
     }
 
     private void setFrequencyControls() {

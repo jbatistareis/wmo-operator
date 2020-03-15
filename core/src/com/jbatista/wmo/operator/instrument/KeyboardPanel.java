@@ -16,7 +16,7 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import java.util.LinkedList;
 import java.util.List;
 
-public class KeyboardPanel extends Window {
+class KeyboardPanel extends Window {
     private final InstrumentActor instrumentActor;
     private final List<Image> keys = new LinkedList<>();
 

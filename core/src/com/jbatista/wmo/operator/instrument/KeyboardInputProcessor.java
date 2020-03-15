@@ -3,7 +3,7 @@ package com.jbatista.wmo.operator.instrument;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 
-public class KeyboardInputProcessor implements InputProcessor {
+class KeyboardInputProcessor implements InputProcessor {
 
     private final InstrumentActor instrumentActor;
 
@@ -37,22 +37,9 @@ public class KeyboardInputProcessor implements InputProcessor {
         instrumentActor.releaseKey(index + keyIndexOffset);
     }
 
-    void changeInstrument(int offset) {
-        instrumentId = Math.max(0, Math.min(instrumentId + offset, 31));
-        instrumentActor.changeInstrument(instrumentId);
-    }
-
     @Override
     public boolean keyDown(int keycode) {
         switch (keycode) {
-            case Input.Keys.UP:
-                changeInstrument(1);
-                break;
-
-            case Input.Keys.DOWN:
-                changeInstrument(-1);
-                break;
-
             case Input.Keys.LEFT:
                 shiftOctaveLeft();
                 break;

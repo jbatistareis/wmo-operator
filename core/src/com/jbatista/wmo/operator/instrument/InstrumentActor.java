@@ -3,12 +3,14 @@ package com.jbatista.wmo.operator.instrument;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.AudioDevice;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.jbatista.wmo.AudioFormat;
 import com.jbatista.wmo.KeyboardNote;
 import com.jbatista.wmo.preset.InstrumentPreset;
 import com.jbatista.wmo.synthesis.Instrument;
+import com.kotcrab.vis.ui.widget.file.FileChooser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +21,10 @@ public class InstrumentActor extends Table {
 
     private final Instrument instrument = new Instrument(AudioFormat._44100Hz_16bit);
     private final InputProcessor keyboardInputProcessor;
+    private final SysexPanel sysexPanel;
     private final KeyboardPanel keyboardPanel;
     private final List<OscillatorPanel> oscillatorPanels = new ArrayList<>();
+    private final HorizontalGroup hboxGeneral = new HorizontalGroup();
     private final AudioDevice audioDevice = Gdx.audio.newAudioDevice(44100, false);
 
     private final KeyboardNote[] notes = new KeyboardNote[61];
@@ -32,11 +36,10 @@ public class InstrumentActor extends Table {
     private int currentOctave;
     private int keyOffset = 48;
 
-    private final List<InstrumentPreset> presets = new ArrayList<>();
-
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public InstrumentActor(Skin skin) {
+        FileChooser.setDefaultPrefsName("com.jbatista.wmo.operator");
         instrument.setGain(0.02);
 
         bottom();
@@ -46,6 +49,8 @@ public class InstrumentActor extends Table {
         for (int i = keyOffset; i <= (keyOffset + 60); i++) {
             notes[i - keyOffset] = allNotes[i];
         }
+
+        sysexPanel = new SysexPanel(this, skin);
 
         keyboardInputProcessor = new KeyboardInputProcessor(this);
         keyboardPanel = new KeyboardPanel(this, skin);
@@ -67,7 +72,11 @@ public class InstrumentActor extends Table {
             oscillatorPanels.add(oscillatorPanel);
         }
 
-        add(keyboardPanel).colspan(3).expandX().row();
+        hboxGeneral.space(5);
+        hboxGeneral.addActor(sysexPanel);
+
+        add(hboxGeneral).expand().colspan(3).row();
+        add(keyboardPanel).colspan(3).expand().row();
 
         executorService.submit(() -> {
             while (true) {
@@ -114,9 +123,8 @@ public class InstrumentActor extends Table {
         keyboardPanel.releaseKey(index);
     }
 
-    void changeInstrument(int id) {
-        System.out.println(presets.get(id).getName());
-        instrument.loadInstrumentPreset(presets.get(id));
+    void changeInstrument(InstrumentPreset instrumentPreset) {
+        instrument.loadInstrumentPreset(instrumentPreset);
         oscillatorPanels.forEach(panel -> panel.reload());
     }
 
