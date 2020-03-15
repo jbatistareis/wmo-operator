@@ -3,6 +3,3 @@
 
 
 _work in progress_
-
-
-_All icons are provided by [Font Awesome](https://fontawesome.com)_
