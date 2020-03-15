@@ -9,6 +9,7 @@ public class KeyboardInputProcessor implements InputProcessor {
 
     private int octaveIndex = 2;
     private int keyIndexOffset = 24;
+    private int instrumentId = -1;
 
     KeyboardInputProcessor(InstrumentActor instrumentActor) {
         this.instrumentActor = instrumentActor;
@@ -36,9 +37,22 @@ public class KeyboardInputProcessor implements InputProcessor {
         instrumentActor.releaseKey(index + keyIndexOffset);
     }
 
+    void changeInstrument(int offset) {
+        instrumentId = Math.max(0, Math.min(instrumentId + offset, 31));
+        instrumentActor.changeInstrument(instrumentId);
+    }
+
     @Override
     public boolean keyDown(int keycode) {
         switch (keycode) {
+            case Input.Keys.UP:
+                changeInstrument(1);
+                break;
+
+            case Input.Keys.DOWN:
+                changeInstrument(-1);
+                break;
+
             case Input.Keys.LEFT:
                 shiftOctaveLeft();
                 break;
