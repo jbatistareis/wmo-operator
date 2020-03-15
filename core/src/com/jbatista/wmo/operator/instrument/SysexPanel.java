@@ -2,6 +2,7 @@ package com.jbatista.wmo.operator.instrument;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -16,13 +17,14 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.file.FileTypeFilter;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 class SysexPanel extends Window {
 
     private final InstrumentActor instrumentActor;
+    private final Skin skin;
+
     private final Table tabMain = new Table();
     private final VisTextButton btnlLoad = new VisTextButton("Load file");
     private final VisSelectBox<String> lstPresetNames = new VisSelectBox<>();
@@ -33,6 +35,7 @@ class SysexPanel extends Window {
     SysexPanel(InstrumentActor instrumentActor, Skin skin) {
         super("No file loaded", skin);
         this.instrumentActor = instrumentActor;
+        this.skin = skin;
         add(tabMain);
         tabMain.pad(5);
         tabMain.add(btnlLoad).padRight(5);
@@ -78,8 +81,13 @@ class SysexPanel extends Window {
             }
 
             lstPresetNames.setItems(names);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            final Dialog dialog = new Dialog("An error occurred", skin, "dialog");
+            dialog.setMovable(false);
+            dialog.setModal(true);
+            dialog.text(e.getMessage());
+            dialog.button("Ok", true);
+            dialog.show(getStage());
         }
     }
 
