@@ -1,8 +1,6 @@
 package com.jbatista.wmo.operator.instrument;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.jbatista.wmo.KeyboardNote;
 import com.jbatista.wmo.TransitionCurve;
@@ -15,7 +13,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
-class OscillatorPanel extends Window {
+class OscillatorPanel extends VisWindow {
 
     private final Oscillator oscillator;
     private final VisTable mainTable = new VisTable();
@@ -67,8 +65,9 @@ class OscillatorPanel extends Window {
     private final VisSelectBox<BreakpointCurve> lstBrkLeftCurve = new VisSelectBox<>();
     private final VisSelectBox<BreakpointCurve> lstBrkRightCurve = new VisSelectBox<>();
 
-    OscillatorPanel(int id, Oscillator oscillator, Skin skin) {
-        super("Oscillator " + id, skin);
+    OscillatorPanel(int id, Oscillator oscillator) {
+        super("Oscillator " + id);
+        setMovable(false);
         this.oscillator = oscillator;
         add(mainTable);
 
@@ -78,9 +77,9 @@ class OscillatorPanel extends Window {
 
         sldFreqDetune.setValue(0);
         tabFreq.add(chkFreqRatioFixed).left();
-        tabFreq.add(lblFrequency).expand().padRight(5).center();
+        tabFreq.add(lblFrequency).expand().center();
         tabFreq.add(lblCoarse).expand().padRight(5).right();
-        tabFreq.add(sldfreqCoarse).expand().padRight(5).expand().row();
+        tabFreq.add(sldfreqCoarse).expand().padRight(5).row();
         tabFreq.add(lblDetune).expand().padRight(5).right();
         tabFreq.add(sldFreqDetune).expand().padBottom(5);
         tabFreq.add(lblFine).expand().padRight(5).right();
@@ -156,10 +155,18 @@ class OscillatorPanel extends Window {
 
     private void setFrequencyLabel() {
         if (oscillator.isFixedFrequency()) {
-            lblFrequency.setText(FREQ_FORMAT.format(oscillator.getEffectiveFrequency()) + " Hz");
+            lblFrequency.setText(FREQ_FORMAT.format(oscillator.getEffectiveFrequency()) + " Hz" + getDetuneLabel());
         } else {
-            lblFrequency.setText(String.valueOf(FREQ_FORMAT.format(oscillator.getEffectiveFrequency())));
+            lblFrequency.setText(FREQ_FORMAT.format(oscillator.getEffectiveFrequency()) + getDetuneLabel());
         }
+    }
+
+    private String getDetuneLabel() {
+        return (oscillator.getFrequencyDetune() == 0)
+                ? ""
+                : (oscillator.getFrequencyDetune() < 0)
+                ? " " + oscillator.getFrequencyDetune()
+                : " +" + oscillator.getFrequencyDetune();
     }
 
     private void setEgControls() {
@@ -216,6 +223,7 @@ class OscillatorPanel extends Window {
     }
 
     private void setEgBindings() {
+        // level
         sldEgALevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -244,6 +252,7 @@ class OscillatorPanel extends Window {
             }
         });
 
+        // rate
         spnEgARate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

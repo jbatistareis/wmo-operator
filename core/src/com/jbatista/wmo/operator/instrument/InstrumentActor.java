@@ -4,12 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.jbatista.wmo.AudioFormat;
 import com.jbatista.wmo.KeyboardNote;
 import com.jbatista.wmo.preset.InstrumentPreset;
 import com.jbatista.wmo.synthesis.Instrument;
+import com.kotcrab.vis.ui.layout.GridGroup;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ public class InstrumentActor extends Table {
 
     private final Instrument instrument = new Instrument(AudioFormat._44100Hz_16bit);
     private final InputProcessor keyboardInputProcessor;
+    private final List<OscillatorPanel> oscillatorPanels = new ArrayList<>();
     private final SysexPanel sysexPanel;
     private final KeyboardPanel keyboardPanel;
-    private final List<OscillatorPanel> oscillatorPanels = new ArrayList<>();
     private final HorizontalGroup hboxGeneral = new HorizontalGroup();
     private final AudioDevice audioDevice = Gdx.audio.newAudioDevice(44100, false);
 
@@ -38,29 +38,15 @@ public class InstrumentActor extends Table {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public InstrumentActor(Skin skin) {
+    public InstrumentActor() {
         FileChooser.setDefaultPrefsName("com.jbatista.wmo.operator");
         instrument.setGain(0.02);
 
         bottom();
         setFillParent(true);
 
-        final KeyboardNote[] allNotes = KeyboardNote.values();
-        for (int i = keyOffset; i <= (keyOffset + 60); i++) {
-            notes[i - keyOffset] = allNotes[i];
-        }
-
-        sysexPanel = new SysexPanel(this, skin);
-
-        keyboardInputProcessor = new KeyboardInputProcessor(this);
-        keyboardPanel = new KeyboardPanel(this, skin);
-        keyboardPanel.changeOctaveLabel(2);
-        keyboardPanel.setMovable(false);
-        keyboardPanel.pack();
-
         for (int i = 0; i < 6; i++) {
-            final OscillatorPanel oscillatorPanel = new OscillatorPanel(i + 1, instrument.getAlgorithm().getOscillator(i), skin);
-            oscillatorPanel.setMovable(false);
+            final OscillatorPanel oscillatorPanel = new OscillatorPanel(i + 1, instrument.getAlgorithm().getOscillator(i));
             oscillatorPanel.pack();
 
             if ((i != 2) && (i != 5)) {
@@ -72,11 +58,23 @@ public class InstrumentActor extends Table {
             oscillatorPanels.add(oscillatorPanel);
         }
 
+        sysexPanel = new SysexPanel(this);
         hboxGeneral.space(5);
         hboxGeneral.addActor(sysexPanel);
 
+        final KeyboardNote[] allNotes = KeyboardNote.values();
+        for (int i = keyOffset; i <= (keyOffset + 60); i++) {
+            notes[i - keyOffset] = allNotes[i];
+        }
+
+        keyboardInputProcessor = new KeyboardInputProcessor(this);
+        keyboardPanel = new KeyboardPanel(this);
+        keyboardPanel.changeOctaveLabel(2);
+        keyboardPanel.setMovable(false);
+        keyboardPanel.pack();
+
         add(hboxGeneral).expand().colspan(3).row();
-        add(keyboardPanel).colspan(3).expand().row();
+        add(keyboardPanel).expand().colspan(3).row();
 
         executorService.submit(() -> {
             while (true) {

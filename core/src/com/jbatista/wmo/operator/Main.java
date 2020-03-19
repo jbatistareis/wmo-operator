@@ -23,12 +23,11 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         VisUI.load();
-        skin = new Skin(Gdx.files.internal("visui/uiskin.json"));
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(new FitViewport(1280, 720, camera));
 
-        instrumentActor = new InstrumentActor(skin);
+        instrumentActor = new InstrumentActor();
 
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);

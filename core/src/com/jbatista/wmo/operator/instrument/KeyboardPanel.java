@@ -6,17 +6,16 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.kotcrab.vis.ui.widget.VisWindow;
 
 import java.util.LinkedList;
 import java.util.List;
 
-class KeyboardPanel extends Window {
+class KeyboardPanel extends VisWindow {
     private final InstrumentActor instrumentActor;
     private final List<Image> keys = new LinkedList<>();
 
@@ -33,8 +32,8 @@ class KeyboardPanel extends Window {
 
     private boolean clicked = false;
 
-    KeyboardPanel(InstrumentActor instrumentActor, Skin skin) {
-        super("", skin);
+    KeyboardPanel(InstrumentActor instrumentActor) {
+        super("");
         this.instrumentActor = instrumentActor;
 
         for (int i = 0; i < instrumentActor.getNotes().length; i++) {
