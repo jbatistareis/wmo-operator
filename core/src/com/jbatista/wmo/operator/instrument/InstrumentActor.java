@@ -9,7 +9,6 @@ import com.jbatista.wmo.AudioFormat;
 import com.jbatista.wmo.KeyboardNote;
 import com.jbatista.wmo.preset.InstrumentPreset;
 import com.jbatista.wmo.synthesis.Instrument;
-import com.kotcrab.vis.ui.layout.GridGroup;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 
 import java.util.ArrayList;

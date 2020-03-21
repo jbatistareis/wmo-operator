@@ -56,6 +56,6 @@ project(":core") {
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.kotcrab.vis:vis-ui:1.4.5-SNAPSHOT"
-        api "com.jbatista:WaveMagicOrchestra:0.2"
+        api "com.jbatista:wmo:0.3"
     }
 }
