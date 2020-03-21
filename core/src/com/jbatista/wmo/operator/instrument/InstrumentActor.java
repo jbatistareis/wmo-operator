@@ -5,8 +5,8 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.jbatista.wmo.AudioFormat;
 import com.jbatista.wmo.KeyboardNote;
+import com.jbatista.wmo.SampleFormat;
 import com.jbatista.wmo.preset.InstrumentPreset;
 import com.jbatista.wmo.synthesis.Instrument;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 
 public class InstrumentActor extends Table {
 
-    private final Instrument instrument = new Instrument(AudioFormat._44100Hz_16bit);
+    private final Instrument instrument = new Instrument(SampleFormat._44100Hz_16bit);
     private final InputProcessor keyboardInputProcessor;
     private final List<OscillatorPanel> oscillatorPanels = new ArrayList<>();
     private final SysexPanel sysexPanel;
@@ -116,7 +116,7 @@ public class InstrumentActor extends Table {
     }
 
     void releaseKey(int index) {
-        instrument.releaseKey(index + keyOffset, notes[index].getFrequency());
+        instrument.releaseKey(index + keyOffset);
         keyboardPanel.releaseKey(index);
     }
 
