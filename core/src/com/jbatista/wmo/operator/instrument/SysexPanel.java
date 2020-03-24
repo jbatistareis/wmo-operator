@@ -10,7 +10,6 @@ import com.jbatista.wmo.preset.InstrumentPreset;
 import com.jbatista.wmo.util.Dx7Sysex;
 import com.jbatista.wmo.util.WmoFile;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
-import com.kotcrab.vis.ui.util.dialog.InputDialogAdapter;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisWindow;
@@ -161,6 +160,9 @@ class SysexPanel extends VisWindow {
     }
 
     private void savePrompt() {
+        getStage().addActor(saveSysexDialog.fadeIn());
+
+        /*
         Dialogs.showInputDialog(getStage(), "Enter the instrument name", "Name: ", new InputDialogAdapter() {
             @Override
             public void finished(String input) {
@@ -169,6 +171,7 @@ class SysexPanel extends VisWindow {
                 getStage().addActor(saveSysexDialog.fadeIn());
             }
         });
+        */
     }
 
 }
