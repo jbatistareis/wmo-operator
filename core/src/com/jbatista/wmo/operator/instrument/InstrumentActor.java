@@ -43,7 +43,7 @@ public class InstrumentActor extends Table {
         setFillParent(true);
 
         for (int i = 0; i < 6; i++) {
-            final OscillatorPanel oscillatorPanel = new OscillatorPanel(i + 1, instrument.getAlgorithm().getOscillator(i));
+            final OscillatorPanel oscillatorPanel = new OscillatorPanel(i, instrument);
             oscillatorPanel.pack();
 
             if ((i != 2) && (i != 5)) {
@@ -119,8 +119,12 @@ public class InstrumentActor extends Table {
     }
 
     void changeInstrument(InstrumentPreset instrumentPreset) {
-        instrument.loadInstrumentPreset(instrumentPreset);
+        instrument.setPreset(new InstrumentPreset(instrumentPreset));
         oscillatorPanels.forEach(panel -> panel.reload());
+    }
+
+    InstrumentPreset getCurrentPreset() {
+        return instrument.getPreset();
     }
 
     @Override

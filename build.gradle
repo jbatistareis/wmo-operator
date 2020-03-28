@@ -17,7 +17,7 @@ buildscript {
 
 allprojects {
 
-    version = '1.1'
+    version = '1.2'
     ext {
         appName = "WMO Operator"
         gdxVersion = '1.9.10'
@@ -56,6 +56,6 @@ project(":core") {
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.kotcrab.vis:vis-ui:1.4.5-SNAPSHOT"
-        api "com.jbatista:wmo:0.3"
+        api "com.jbatista:wmo:0.4"
     }
 }

@@ -18,8 +18,6 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.file.FileTypeFilter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 class SysexPanel extends VisWindow {
 
@@ -32,11 +30,10 @@ class SysexPanel extends VisWindow {
     private final VisTextButton btnSave = new VisTextButton("Save");
     private final HorizontalGroup hboxUpper = new HorizontalGroup();
     private final HorizontalGroup hboxLower = new HorizontalGroup();
-    private final VisSelectBox<String> lstPresetNames = new VisSelectBox<>();
+    private final VisSelectBox<InstrumentPreset> lstPresetNames = new VisSelectBox<>();
     private final FileChooser openSysexDialog = new FileChooser(FileChooser.Mode.OPEN);
     private final FileChooser openWmoDialog = new FileChooser(FileChooser.Mode.OPEN);
     private final FileChooser saveSysexDialog = new FileChooser(FileChooser.Mode.SAVE);
-    private final List<InstrumentPreset> presetList = new ArrayList<>();
 
     private final FileTypeFilter fileTypeFilterSysex = new FileTypeFilter(false);
     private final FileTypeFilter fileTypeFilterWmo = new FileTypeFilter(false);
@@ -60,14 +57,11 @@ class SysexPanel extends VisWindow {
         tabMain.add(hboxUpper).center().padBottom(5).row();
         tabMain.add(hboxLower).center();
 
-        presetList.add(new InstrumentPreset());
-        instrumentActor.changeInstrument(presetList.get(0));
-        setPresetsNames();
-
+        lstPresetNames.setItems(new InstrumentPreset());
         lstPresetNames.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                instrumentActor.changeInstrument(presetList.get(lstPresetNames.getSelectedIndex()));
+                instrumentActor.changeInstrument(lstPresetNames.getSelected());
             }
         });
 
@@ -94,7 +88,7 @@ class SysexPanel extends VisWindow {
         saveSysexDialog.setListener(new FileChooserAdapter() {
             @Override
             public void selected(Array<FileHandle> files) {
-                saveWmo(presetList.get(lstPresetNames.getSelectedIndex()), files.first().file());
+                saveWmo(instrumentActor.getCurrentPreset(), files.first().file());
             }
         });
 
@@ -115,26 +109,14 @@ class SysexPanel extends VisWindow {
         btnSave.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                savePrompt();
+                getStage().addActor(saveSysexDialog.fadeIn());
             }
         });
     }
 
-    private void setPresetsNames() {
-        final String[] names = new String[presetList.size()];
-        for (int i = 0; i < presetList.size(); i++) {
-            names[i] = presetList.get(i).getName();
-        }
-
-        lstPresetNames.setItems(names);
-    }
-
     private void loadSysex(File file) {
         try {
-            presetList.clear();
-            presetList.addAll(Dx7Sysex.readInstruments(file));
-            instrumentActor.changeInstrument(presetList.get(0));
-            setPresetsNames();
+            lstPresetNames.setItems(Dx7Sysex.extractPresets(file).toArray(new InstrumentPreset[]{}));
         } catch (Exception e) {
             Dialogs.showErrorDialog(getStage(), e.getMessage(), e);
         }
@@ -142,10 +124,7 @@ class SysexPanel extends VisWindow {
 
     private void loadWmo(File file) {
         try {
-            presetList.clear();
-            presetList.addAll(WmoFile.loadWmoInstruments(file));
-            instrumentActor.changeInstrument(presetList.get(0));
-            setPresetsNames();
+            lstPresetNames.setItems(WmoFile.loadWmoInstruments(file).toArray(new InstrumentPreset[]{}));
         } catch (Exception e) {
             Dialogs.showErrorDialog(getStage(), e.getMessage(), e);
         }
@@ -157,21 +136,6 @@ class SysexPanel extends VisWindow {
         } catch (Exception e) {
             Dialogs.showErrorDialog(getStage(), e.getMessage(), e);
         }
-    }
-
-    private void savePrompt() {
-        getStage().addActor(saveSysexDialog.fadeIn());
-
-        /*
-        Dialogs.showInputDialog(getStage(), "Enter the instrument name", "Name: ", new InputDialogAdapter() {
-            @Override
-            public void finished(String input) {
-                tempInstrumentName = ((input.length() <= 10) ? input : input.substring(0, 10));
-                saveSysexDialog.setDefaultFileName(tempInstrumentName + ".wmo");
-                getStage().addActor(saveSysexDialog.fadeIn());
-            }
-        });
-        */
     }
 
 }

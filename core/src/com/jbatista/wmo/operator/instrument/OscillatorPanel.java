@@ -4,7 +4,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.jbatista.wmo.KeyboardNote;
 import com.jbatista.wmo.TransitionCurve;
-import com.jbatista.wmo.synthesis.Oscillator;
+import com.jbatista.wmo.preset.InstrumentPreset;
+import com.jbatista.wmo.preset.OscillatorPreset;
+import com.jbatista.wmo.synthesis.Instrument;
 import com.kotcrab.vis.ui.widget.*;
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.Spinner;
@@ -15,7 +17,8 @@ import java.util.List;
 
 class OscillatorPanel extends VisWindow {
 
-    private final Oscillator oscillator;
+    private final int id;
+    private final Instrument instrument;
     private final VisTable mainTable = new VisTable();
 
     // frequency
@@ -65,10 +68,11 @@ class OscillatorPanel extends VisWindow {
     private final VisSelectBox<BreakpointCurve> lstBrkLeftCurve = new VisSelectBox<>();
     private final VisSelectBox<BreakpointCurve> lstBrkRightCurve = new VisSelectBox<>();
 
-    OscillatorPanel(int id, Oscillator oscillator) {
-        super("Oscillator " + id);
+    OscillatorPanel(int id, Instrument instrument) {
+        super("Oscillator " + (id + 1));
         setMovable(false);
-        this.oscillator = oscillator;
+        this.id = id;
+        this.instrument = instrument;
         add(mainTable);
 
         // frequency
@@ -145,54 +149,66 @@ class OscillatorPanel extends VisWindow {
         setBreakpointControls();
     }
 
+    private InstrumentPreset instrumentPreset() {
+        return instrument.getPreset();
+    }
+
+    private OscillatorPreset oscillatorPreset() {
+        return instrument.getPreset().getOscillatorPresets()[id];
+    }
+
     private void setFrequencyControls() {
         setFrequencyLabel();
-        chkFreqRatioFixed.setChecked(oscillator.isFixedFrequency());
-        sldFreqDetune.setValue(oscillator.getFrequencyDetune());
-        sldfreqCoarse.setValue((float) oscillator.getFrequencyRatio());
-        sldfreqFine.setValue(oscillator.getFrequencyFine());
+
+        chkFreqRatioFixed.setChecked(oscillatorPreset().isFixedFrequency());
+        sldFreqDetune.setValue(oscillatorPreset().getFrequencyDetune());
+        sldfreqCoarse.setValue((float) oscillatorPreset().getFrequencyRatio());
+        sldfreqFine.setValue(oscillatorPreset().getFrequencyFine());
     }
 
     private void setFrequencyLabel() {
-        if (oscillator.isFixedFrequency()) {
-            lblFrequency.setText(FREQ_FORMAT.format(oscillator.getEffectiveFrequency()) + " Hz" + getDetuneLabel());
+        if (oscillatorPreset().isFixedFrequency()) {
+            // lblFrequency.setText(FREQ_FORMAT.format(preset().getEffectiveFrequency()) + " Hz" + getDetuneLabel());
         } else {
-            lblFrequency.setText(FREQ_FORMAT.format(oscillator.getEffectiveFrequency()) + getDetuneLabel());
+            // lblFrequency.setText(FREQ_FORMAT.format(preset().getEffectiveFrequency()) + getDetuneLabel());
         }
     }
 
     private String getDetuneLabel() {
-        return (oscillator.getFrequencyDetune() == 0)
+        return (oscillatorPreset().getFrequencyDetune() == 0)
                 ? ""
-                : (oscillator.getFrequencyDetune() < 0)
-                ? " " + oscillator.getFrequencyDetune()
-                : " +" + oscillator.getFrequencyDetune();
+                : (oscillatorPreset().getFrequencyDetune() < 0)
+                ? " " + oscillatorPreset().getFrequencyDetune()
+                : " +" + oscillatorPreset().getFrequencyDetune();
     }
 
     private void setEgControls() {
-        sldEgALevel.setValue(oscillator.getEnvelopeGenerator().getAttackLevel());
-        sldEgDLevel.setValue(oscillator.getEnvelopeGenerator().getDecayLevel());
-        sldEgSLevel.setValue(oscillator.getEnvelopeGenerator().getSustainLevel());
-        sldEgRLevel.setValue(oscillator.getEnvelopeGenerator().getReleaseLevel());
-        spnModelEgARate.setValue(oscillator.getEnvelopeGenerator().getAttackSpeed());
-        spnModelEgDRate.setValue(oscillator.getEnvelopeGenerator().getDecaySpeed());
-        spnModelEgSRate.setValue(oscillator.getEnvelopeGenerator().getSustainSpeed());
-        spnModelEgRRate.setValue(oscillator.getEnvelopeGenerator().getReleaseSpeed());
+        sldEgALevel.setValue(oscillatorPreset().getAttackLevel());
+        sldEgDLevel.setValue(oscillatorPreset().getDecayLevel());
+        sldEgSLevel.setValue(oscillatorPreset().getSustainLevel());
+        sldEgRLevel.setValue(oscillatorPreset().getReleaseLevel());
+
+        spnModelEgARate.setValue(oscillatorPreset().getAttackSpeed());
+        spnModelEgDRate.setValue(oscillatorPreset().getDecaySpeed());
+        spnModelEgSRate.setValue(oscillatorPreset().getSustainSpeed());
+        spnModelEgRRate.setValue(oscillatorPreset().getReleaseSpeed());
     }
 
     private void setBreakpointControls() {
-        lstBrkNotes.setSelected(oscillator.getBreakpoint().getNote());
-        spnModelBrkLeftDepth.setValue(oscillator.getBreakpoint().getLeftDepth());
-        spnModelBrkRightDepth.setValue(oscillator.getBreakpoint().getRightDepth());
-        lstBrkLeftCurve.setSelected(BreakpointCurve.values()[TRANSITION_CURVES.indexOf(oscillator.getBreakpoint().getLeftCurve())]);
-        lstBrkRightCurve.setSelected(BreakpointCurve.values()[TRANSITION_CURVES.indexOf(oscillator.getBreakpoint().getRightCurve())]);
+        lstBrkNotes.setSelected(oscillatorPreset().getBreakpointNote());
+
+        spnModelBrkLeftDepth.setValue(oscillatorPreset().getBreakpointLeftDepth());
+        spnModelBrkRightDepth.setValue(oscillatorPreset().getBreakpointRightDepth());
+
+        lstBrkLeftCurve.setSelected(BreakpointCurve.values()[TRANSITION_CURVES.indexOf(oscillatorPreset().getBreakpointLeftCurve())]);
+        lstBrkRightCurve.setSelected(BreakpointCurve.values()[TRANSITION_CURVES.indexOf(oscillatorPreset().getBreakpointRightCurve())]);
     }
 
     private void setFrequencyBindings() {
         chkFreqRatioFixed.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.setFixedFrequency(chkFreqRatioFixed.isChecked());
+                oscillatorPreset().setFixedFrequency(chkFreqRatioFixed.isChecked());
                 setFrequencyLabel();
             }
         });
@@ -200,7 +216,7 @@ class OscillatorPanel extends VisWindow {
         sldFreqDetune.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.setFrequencyDetune((int) sldFreqDetune.getValue());
+                oscillatorPreset().setFrequencyDetune((int) sldFreqDetune.getValue());
                 setFrequencyLabel();
             }
         });
@@ -208,7 +224,7 @@ class OscillatorPanel extends VisWindow {
         sldfreqFine.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.setFrequencyFine((int) sldfreqFine.getValue());
+                oscillatorPreset().setFrequencyFine((int) sldfreqFine.getValue());
                 setFrequencyLabel();
             }
         });
@@ -216,7 +232,7 @@ class OscillatorPanel extends VisWindow {
         sldfreqCoarse.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.setFrequencyRatio(sldfreqCoarse.getValue());
+                oscillatorPreset().setFrequencyRatio(sldfreqCoarse.getValue());
                 setFrequencyLabel();
             }
         });
@@ -227,28 +243,28 @@ class OscillatorPanel extends VisWindow {
         sldEgALevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getEnvelopeGenerator().setAttackLevel((int) sldEgALevel.getValue());
+                oscillatorPreset().setAttackLevel((int) sldEgALevel.getValue());
             }
         });
 
         sldEgDLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getEnvelopeGenerator().setDecayLevel((int) sldEgDLevel.getValue());
+                oscillatorPreset().setDecayLevel((int) sldEgDLevel.getValue());
             }
         });
 
         sldEgSLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getEnvelopeGenerator().setSustainLevel((int) sldEgSLevel.getValue());
+                oscillatorPreset().setSustainLevel((int) sldEgSLevel.getValue());
             }
         });
 
         sldEgRLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getEnvelopeGenerator().setReleaseLevel((int) sldEgRLevel.getValue());
+                oscillatorPreset().setReleaseLevel((int) sldEgRLevel.getValue());
             }
         });
 
@@ -256,66 +272,65 @@ class OscillatorPanel extends VisWindow {
         spnEgARate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getEnvelopeGenerator().setAttackSpeed(spnModelEgARate.getValue());
+                oscillatorPreset().setAttackSpeed(spnModelEgARate.getValue());
             }
         });
 
         spnEgDRate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getEnvelopeGenerator().setDecaySpeed(spnModelEgDRate.getValue());
+                oscillatorPreset().setDecaySpeed(spnModelEgDRate.getValue());
             }
         });
 
         spnEgSRate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getEnvelopeGenerator().setSustainSpeed(spnModelEgSRate.getValue());
+                oscillatorPreset().setSustainSpeed(spnModelEgSRate.getValue());
             }
         });
 
         spnEgRRate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getEnvelopeGenerator().setReleaseSpeed(spnModelEgRRate.getValue());
+                oscillatorPreset().setReleaseSpeed(spnModelEgRRate.getValue());
             }
         });
-
     }
 
     private void setBreakpointBindings() {
         lstBrkNotes.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getBreakpoint().setNote(lstBrkNotes.getSelected());
+                oscillatorPreset().setBreakpointNote(lstBrkNotes.getSelected());
             }
         });
 
         spnBrkLeftDepth.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getBreakpoint().setLeftDepth(spnModelBrkLeftDepth.getValue());
+                oscillatorPreset().setBreakpointLeftDepth(spnModelBrkLeftDepth.getValue());
             }
         });
 
         spnBrkRightDepth.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getBreakpoint().setRightDepth(spnModelBrkRightDepth.getValue());
+                oscillatorPreset().setBreakpointRightDepth(spnModelBrkRightDepth.getValue());
             }
         });
 
         lstBrkLeftCurve.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getBreakpoint().setLeftCurve(lstBrkLeftCurve.getSelected().getCurve());
+                oscillatorPreset().setBreakpointLeftCurve(lstBrkLeftCurve.getSelected().getCurve());
             }
         });
 
         lstBrkRightCurve.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                oscillator.getBreakpoint().setRightCurve(lstBrkRightCurve.getSelected().getCurve());
+                oscillatorPreset().setBreakpointRightCurve(lstBrkRightCurve.getSelected().getCurve());
             }
         });
     }
